@@ -89,7 +89,7 @@ gulp.task('serve', ['styles', 'fonts'], function () {
   });
 
   // watch for changes
-  gulp.watch([
+//  gulp.watch([
     'app/static/*.html',
     'app/static/scripts/**/*.js',
     'app/static/images/**/*',
@@ -99,6 +99,10 @@ gulp.task('serve', ['styles', 'fonts'], function () {
   gulp.watch('app/static/styles/**/*.scss', ['styles']);
   gulp.watch('app/static/fonts/**/*', ['fonts']);
   gulp.watch('bower.json', ['wiredep', 'fonts']);
+});
+
+gulp.task('6to5',function(){
+    gulp.src('app/*.js').pipe(babel()).pipe('dist');
 });
 
 // inject bower components
@@ -119,9 +123,14 @@ gulp.task('wiredep', function () {
     .pipe(gulp.dest('app'));
 });
 
-gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras'], function () {
+gulp.task('build', ['jshint', 'html', 'images', 'fonts', 'extras','6to5'], function () {
   return gulp.src('dist/static/**/*').pipe($.size({title: 'build', gzip: true}));
 });
+
+gulp.task('watch',function() {
+    gulp.start('6to5');
+})
+
 
 gulp.task('default', ['clean'], function () {
   gulp.start('build');
