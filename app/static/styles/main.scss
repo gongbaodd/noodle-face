@@ -14,6 +14,7 @@ $icon-font-path: '../fonts/';
 body {
   padding-top: 20px;
   padding-bottom: 20px;
+    background: #e8e8e8;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -28,6 +29,18 @@ body {
 .header {
   border-bottom: 1px solid #e5e5e5;
 
+    background: url('../images/back.jpg') no-repeat center center;
+    background-size: cover;
+    min-height: 500px;
+
+    .video{
+        background: rgba(255,255,255,0.6);
+        box-shadow: 0 0 100px #fff;
+    }
+
+    .canvas,.video{
+        position: absolute;
+    }
   /* Make the masthead heading the same height as the navigation */
   h3 {
     margin-top: 0;
