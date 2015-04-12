@@ -1,54 +1,37 @@
 'use strict';
-;(function(){
-    var faces = [];
-    var mainTimer;
-    var noDetect = 0;
-    var fps = 16;
-
+(function(){
     var video = document.getElementById('video');
-    var canvas= document.getElementById('canvas');
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
 
-    var ctx = canvas.getContext('2d');
-window.onload = function(){
-    navigator.getMedia = (navigator.getUserMedia||navigator.webkitGetUserMedia||navigator.mozGetUserMedia||navigator.msGetUserMedia);
-    navigator.getMedia({video:true,audio:false},function(stream){
-        video.src = window.URL.createObjectURL(stream);
-    },function(err){console.log(err);});
+    var nodetect = 0;
 
-    var socket = io.connect(top.location.origin);
-    socket.on('face',function(im){
-        if(!im||im.length === 0){
-            if(++noDetect>10){
-                noDetect=0;
-                faces = [];
-            }
-            return;
-        }
-        faces = im;
-        console.log(JSON.stringify({faces:{total:faces.length,data:faces}}));
-    }).on('disconnect',function(data){
-        console.log('disconnected',data);
+    var tracker = new tracking.ObjectTracker('face');
+    tracker.setInitialScale(4);
+    tracker.setStepSize(2);
+    tracker.setEdgesDensity(0.1);
+
+    tracking.track('#video',tracker,{camera:true});
+
+    tracker.on('track',function(event){
+        context.clearRect(0,0,canvas.width,canvas.height);
+
+        event.data.forEach(function(rect){
+            _drawFace(context,rect);
+        });
     });
 
-    function capture() {
-        mainTimer = setInterval(function(){
-            ctx.drawImage(video,0,0,720,500);
-            if(faces && faces.length){
-                for(var i in faces){
-                    var face = faces[i];
-
-                    ctx.beginPath();
-                    ctx.rect(face.x,face.y,face.width,face.height);
-                    ctx.fillStyle = 'rgba(46,166,203,0.5)';
-                    ctx.fill();
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#2ba6cb';
-                    ctx.stroke();
-                }
-            }
-            socket.emit('canvas',canvas.toDataURL('image/jpeg'));
-        },1000/fps);
-    }
-     capture();
-}
+    function _drawFace(context,rect){
+        context.beginPath();
+        context.rect(rect.x,rect.y,rect.width,rect.height);
+        context.fillStyle = 'rgba(46, 166, 203, 0.5)';
+        context.fill();
+        context.lineWidth = 2;
+        context.strokeStyle = '#2ba6cb';
+        context.stroke();
+        context.font = '11px Helvetica';
+        context.fillStyle = "#fff";
+        context.fillText('x: ' + rect.x + 'px', rect.x + rect.width + 5, rect.y + 11);
+        context.fillText('y: ' + rect.y + 'px', rect.x + rect.width + 5, rect.y + 22);
+    };
 })();

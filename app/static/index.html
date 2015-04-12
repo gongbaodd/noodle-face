@@ -43,8 +43,8 @@
 
     <div class="header">
         <div class="container">
-            <video id="video" class="video" width="720" height="500" autoplay></video>
-            <canvas id="canvas" class="canvas" width="720" height="500"></canvas>
+            <video id="video" class="video" width="640" height="480" autoplay></video>
+            <canvas id="canvas" class="canvas" width="640" height="480"></canvas>
         </div>
     </div>
     <div></div>
@@ -53,6 +53,12 @@
 
     <!-- build:js scripts/vendor/socket.io.js -->
     <script src="/node_modules/socket.io/node_modules/socket.io-client/socket.io.js"></script>
+    <!-- endbuild -->
+    <!-- build:js scripts/vendor/tracking.js -->
+    <script src="/bower_components/tracking.js/build/tracking-min.js"></script>
+    <!-- endbuild -->
+    <!-- build:js scripts/vendor/data/face.js -->
+    <script src="/bower_components/tracking.js/build/data/face-min.js"></script>
     <!-- endbuild -->
     <!-- build:js scripts/vendor.js -->
     <!-- bower:js -->

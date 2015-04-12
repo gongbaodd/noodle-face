@@ -23,6 +23,7 @@ body {
 .footer {
   padding-left: 15px;
   padding-right: 15px;
+    position: relative;
 }
 
 /* Custom page header */
@@ -31,7 +32,7 @@ body {
 
     background: url('../images/back.jpg') no-repeat center center;
     background-size: cover;
-    min-height: 500px;
+    min-height: 480px;
 
     .video{
         background: rgba(255,255,255,0.6);
@@ -40,6 +41,8 @@ body {
 
     .canvas,.video{
         position: absolute;
+        left:50%;
+        margin-left:-320px;
     }
   /* Make the masthead heading the same height as the navigation */
   h3 {
