@@ -5,18 +5,32 @@ import http from 'http';
 import mime from 'mime';
 import socket from 'socket.io';
 import router from 'koa-router';
-import static from 'koa-static';
+import serve from 'koa-static';
 
 var app = koa();
 
 app.use(pageNotFound);
 app.use(router(app));
-app.use(static('./static'));
+app.use(serve('./static'));
+
+var server = http.Server(app.callback());
+var io = socket(server);
+
+io.on('connection',function(socket){
+    socket.on('canvas',function(face){
+        if(face && typeof face === 'string'){
+            if(face.split(',') != null){
+                cv.readImage(new Buffer(face.split(',')[1],'base64'),(err,im)=>{
+                    im.convertGrayscale();
+                    im.resize(200,200);
+                });
+            }
+        }
+    })
+})
 
 app.get('/',function* (next){
-    fs.readFile('./static/index.html',funtion(err,data){
-                this.body = data;
-                });
+    this.response.redirect('/index.html');
 });
 
 function *pageNotFound(next){
@@ -42,5 +56,6 @@ function *pageNotFound(next){
     }
 }
 
-app.listen(8080);
+
+server.listen(8080);
 console.log('listening 8080')

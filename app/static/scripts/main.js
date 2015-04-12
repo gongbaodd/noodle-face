@@ -4,7 +4,7 @@
     var canvas = document.getElementById('canvas');
     var context = canvas.getContext('2d');
 
-    var socket = io.connect(top.location.origin);
+    var socket = io(top.location.origin);
 
     var nodetect = 0;
 
