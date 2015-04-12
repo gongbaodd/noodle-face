@@ -1,13 +1,15 @@
+'use strict';
 ;(function(){
     var faces = [];
     var mainTimer;
+    var noDetect = 0;
     var fps = 16;
 
     var video = document.getElementById('video');
     var canvas= document.getElementById('canvas');
 
     var ctx = canvas.getContext('2d');
-
+window.onload = function(){
     navigator.getMedia = (navigator.getUserMedia||navigator.webkitGetUserMedia||navigator.mozGetUserMedia||navigator.msGetUserMedia);
     navigator.getMedia({video:true,audio:false},function(stream){
         video.src = window.URL.createObjectURL(stream);
@@ -15,14 +17,18 @@
 
     var socket = io.connect(top.location.origin);
     socket.on('face',function(im){
-        if(!im||im.length === 0) return;
+        if(!im||im.length === 0){
+            if(++noDetect>10){
+                noDetect=0;
+                faces = [];
+            }
+            return;
+        }
         faces = im;
         console.log(JSON.stringify({faces:{total:faces.length,data:faces}}));
     }).on('disconnect',function(data){
         console.log('disconnected',data);
     });
-
-    capture();
 
     function capture() {
         mainTimer = setInterval(function(){
@@ -43,4 +49,6 @@
             socket.emit('canvas',canvas.toDataURL('image/jpeg'));
         },1000/fps);
     }
+     capture();
+}
 })();

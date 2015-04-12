@@ -21,34 +21,34 @@ var app = http.createServer((req,res)=>{
 });
 
 app.listen(8080);
+console.log('listening port 8080');
 
 var io = socket.listen(app).on('connection',(socket)=>{
     socket.on('canvas',(data)=>{
-        if(typeof data == 'string'){
-            data = data?data.split(',')[1]:data;
-            cv.readImage(new Buffer(data,'base64'),(err,im)=>{
-               im.detectObject('./node_modules/opencv/data/haarcascade_frontalface_alt2.xml',{},(err,faces)=>{
-                   if(err)console.log(err);
-                   if(faces && faces.length>0){
-                       return socket.emit('face',faces);
-                   }else{
-                       return socket.emit('face',[]);
+        try{
+            readCanvas(data,socket);
+        }catch(e){
+            console.log(e);
+            socket.emit('faces',[]);
+        }
+    })
+})
+
+
+function readCanvas(data,socket) {
+    if(typeof data === 'string'){
+            var _ref;
+            data = data != null ? (_ref = data.split(',')) != null ? _ref[1] : void 0 : void 0;
+            return cv.readImage(new Buffer(data,'base64'),(err,im)=>{
+                if(err) console.log(err);
+               im.detectObject('../node_modules/opencv/data/haarcascade_frontalface_alt.xml',{},(err,faces)=>{
+                   if(!((faces != null ? faces.length : void 0)>0)){
+                       return socket.emit('faces',[]);
                    }
+                   return socket.emit('faces',faces);
                });
             });
         }else{
             return;
         }
-    })
-})
-io.disable('sync disconnect on unload')
-io.enable('browser client minification')
-io.enable('browser client etag')
-io.enable('browser client gzip')
-io.enable('log');
-io.set('log level', 1)
-io.set('transports', [
-    'websocket',
-  'xhr-polling',
-  'jsonp-polling'
-])
+}
