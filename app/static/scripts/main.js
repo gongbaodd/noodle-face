@@ -50,6 +50,6 @@
         _canvas.height= rect.height;
         _canvas.getContext('2d').drawImage(video,rect.x,rect.y,rect.width,rect.height,0,0,rect.width,rect.height);
 
-        return _canvas.toDataURL('image/jpg');
+        return _canvas.toDataURL('image/jpeg');
     };
 })();
