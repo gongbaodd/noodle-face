@@ -107,7 +107,7 @@ gulp.task('serve', ['styles', 'fonts','bower'], function () {
 });
 
 gulp.task('6to5',function(){
-    gulp.src('app/*.js').pipe(babel()).pipe(gulp.dest('dist'));
+    gulp.src('app/*.js').pipe(babel({"blacklist":["regenerator"]})).pipe(gulp.dest('dist'));
 });
 
 // inject bower components
