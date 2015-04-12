@@ -14,7 +14,8 @@ $icon-font-path: '../fonts/';
 body {
   padding-top: 20px;
   padding-bottom: 20px;
-    background: #e8e8e8;
+    background-color: #eee;
+    overflow-x: hidden;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -55,9 +56,10 @@ body {
 
 /* Custom page footer */
 .footer {
-  padding-top: 19px;
+  padding: 19px;
   color: #777;
   border-top: 1px solid #e5e5e5;
+    text-align: right;
 }
 
 .container-narrow > hr {
@@ -75,11 +77,28 @@ body {
 }
 
 /* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-  p + h4 {
-    margin-top: 28px;
-  }
+.faces {
+    margin:10px;
+    background: #eee;
+    padding: 10px;
+
+    .face{
+        width: 100px;
+        margin: 0 auto;
+        img{
+            width:100px;
+            height:100px;
+            border-radius: 50px;
+            margin: 0 auto;
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px #000;
+        }
+        strong{
+            text-align: center;
+            display: inline-block;
+            width: 100%;
+        }
+    }
 }
 
 /* Responsive: Portrait tablets and up */

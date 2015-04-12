@@ -27,8 +27,21 @@
         });
     });
 
-    socket.on('face',function(faces){
-
+    socket.on('open',function(data){
+        console.log(data);
+    });
+    socket.on('face',function(data){
+//        console.log(data);
+        var str = '<div class="col-sm-2">'+
+                        '<div class="face">'+
+                            '<img src="data:image/jpeg;base64,'+data.face+'" alt="'+data.id+'" width="100" height="100">'+
+                            '<strong>'+data.id+'</strong>'+
+                        '</div>'+
+                  '</div>';
+        var faces = document.getElementById("faces");
+        var old = faces.innerHTML;
+//        console.log(old);
+        faces.innerHTML = old + str;
     });
 
     function _drawFace(context,rect){

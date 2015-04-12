@@ -22,6 +22,10 @@ var db = mongo.MongoClient;
 const DB_URL = 'mongodb://localhost:27017/faces';
 
 io.on('connection',function(socket){
+    console.log("connection on"+socket.handshake.address);
+
+    socket.emit('open',"hello from server");
+
     socket.on('canvas',function(face){
         if(face && typeof face === 'string'){
             if(face.split(',') != null){
@@ -29,41 +33,47 @@ io.on('connection',function(socket){
                 cv.readImage(face,(err,im)=>{
 
                     im.resize(200,200);
-                    var detected = false;
-                    var faces = [];
+
+                    var image = im;
+                    var faces = []
 
                     db.connect(DB_URL,(err,db)=>{
                         var collection = db.collection('inf');
-                        collection.find({class:1104052}).toArray((err,doc)=>{
+                        collection.find({}).toArray((err,doc)=>{
+
+                            console.log(`[${new Date()}]READ ${doc.length} files`);
+
                             doc.forEach((elem)=>{
                                 var base = elem.face;
-                                try{
                                     cv.readImage(new Buffer(base,'base64'),(err,im)=>{
                                         if(err){
-                                            console.log(err);
-                                            return;
+                                            console.log(`[${elem.id}]${e}`);
                                         }
+                                        console.log(`[PUSHING] ${elem.id}`);
                                         faces.push([elem.id,im]);
+                                        if(faces.length == doc.length){
+                                            var pca = new cv.FaceRecognizer.createEigenFaceRecognizer();
+
+                                            pca.trainSync(faces);
+                                            var result = pca.predictSync(image);
+                                            console.log("===========predict==============")
+                                            console.log(result);
+
+                                            if(result.confidence>8500){
+                                                var buffer = im.toBuffer().toString('base64');
+                                                var time   = new Date();
+
+                                                faceUnknown(buffer,time,socket.handshake.address);
+                                            }else{
+                                                checkTime(result.id,image,doc,socket);
+                                            }
+                                            db.close();
+                                        }
                                     });
-                                }catch(e){
-                                    console.log(e);
-                                }
-                            })
+                            });
+
                         })
                     });
-                    var pca = new cv.FaceRecognizer.createEigenFaceRecognizer();
-                    try{
-                        pca.trainSync(faces);
-                        var result = pca.predictSync(im);
-                        console.log(result);
-                    }catch(e){
-                        console.log(e);
-                    }
-
-                    var buffer = im.toBuffer().toString('base64');
-                    var time   = new Date();
-                    faceUnknown(buffer,time,socket.handshake.address);
-
                 });
             }
         }
@@ -106,10 +116,45 @@ function faceUnknown(buffer,time,ip){
                             time:time,
                             ip:ip
                         },function(err,result){
-                            console.log("inserted one face");
+                            console.log("inserted one unknown face");
                             db.close();
                         });
                     });
+}
+function checkTime(id,im,doc,socket){
+            var emit = true;
+            var time = new Date();
+            var ip   = socket.handshake.address;
+            for(let i=0;i<doc.length;i++){
+                if(doc[i].id != id)continue;
+                if((new Date(doc[i].time)).getTime()-(new Date()).getTime()<90*60*1000){
+                    if(ip===doc[i].ip){
+                        emit = false;
+                        break;
+                    }
+                }
+            }
+            if(emit){
+                console.log("emiting>>>>>>>>>>>>>>>>>>>")
+                socket.emit('face',{
+                            face:im,
+                            id:id
+                });
+            }
+//            db.connect(DB_URL,(err,db)=>{
+//                        console.log(`[${time}]${ip}:${id}`);
+//                        var collection = db.collection('inf');
+//                        collection.insert({
+//                            face:im,
+//                            time:time,
+//                            ip:ip,
+//                            id:id,
+//                            class:id.slice(0,7)
+//                        },function(err,result){
+//                            console.log("inserted one new face");
+//                            db.close();
+//                        });
+//            });
 }
 
 
